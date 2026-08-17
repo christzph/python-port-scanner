@@ -2,6 +2,20 @@ import socket
 import sys
 from datetime import datetime
 
+def scan_port(target_ip, port):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.5)
+            
+            result = s.connect_ex((target_ip, port))
+            
+            if result == 0:
+                print(f"[+] Porta {port:<5}/TCP: ABERTA")
+                return True
+    except (socket.timeout, socket.error):
+        pass
+    return False
+
 def main():
     print("=" * 60)
     print(" PYTHON PORT SCANNER V1.0 - AUDITORIA DE REDES")
