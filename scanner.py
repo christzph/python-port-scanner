@@ -3,6 +3,36 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
+COMMON_PORTS = {
+    21: "FTP",
+    22: "SSH",
+    23: "Telnet",
+    25: "SMTP",
+    53: "DNS",
+    80: "HTTP",
+    110: "POP3",
+    443: "HTTPS",
+    8080: "HTTP-Proxy"
+}
+
+def banner_grabbing(target_ip, port):
+    """
+    Tenta capturar o banner/identificacao do servico conectado.
+    """
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1.2)
+            s.connect((target_ip, port))
+            
+            if port in [80, 8080]:
+                s.sendall(b"HEAD / HTTP/1.1\r\nHost: localhost\r\n\r\n")
+            
+            raw_banner = s.recv(1024)
+            banner = raw_banner.decode("utf-8", errors="ignore").strip().splitlines()[0]
+            return banner if banner else "Sem banner retornado"
+    except Exception:
+        return "Nao foi possivel obter o banner"
+
 def scan_port(target_ip, port):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
