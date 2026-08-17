@@ -1,5 +1,6 @@
 import socket
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 def scan_port(target_ip, port):
@@ -46,6 +47,13 @@ def main():
     print(f"[*] Portas: {start_port} até {end_port}")
     print(f"[*] Início: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 60)
+
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        for port in range(start_port, end_port + 1):
+            executor.submit(scan_port, target_ip, port)
+
+    print("-" * 60)
+    print(f"[*] Fim: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
 if __name__ == "__main__":
     main()
